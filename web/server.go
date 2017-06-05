@@ -6,18 +6,20 @@ import (
 
 	"favon-api/web/controllers"
 
+	"github.com/go-redis/redis"
 	"github.com/julienschmidt/httprouter"
 )
 
 // Init creates the server and loads application routes
-func Init() {
+func Init(redisClient *redis.Client) {
 	router := httprouter.New()
-	routes(router)
+	routes(router, redisClient)
 
 	log.Fatal(http.ListenAndServe(":3000", router))
 }
 
-func routes(router *httprouter.Router) {
+func routes(router *httprouter.Router, redisClient *redis.Client) {
 	// Auth routes
-	router.GET("/auth/tvdb", controllers.AuthTVDBToken)
+	authController := controllers.NewAuthController(redisClient)
+	router.GET("/auth/tvdb", authController.GetTVDBToken)
 }

@@ -1,9 +1,24 @@
 package main
 
 import (
+	"favon-api/utils"
 	"favon-api/web"
+	"log"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	web.Init()
+	// Load environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	// Create redis client
+	redisClient := utils.CreateRedisClient()
+	defer redisClient.Close()
+
+	// Load routes and boot up server
+	web.Init(redisClient)
 }
