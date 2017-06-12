@@ -22,4 +22,9 @@ func routes(router *httprouter.Router, redisClient *redis.Client) {
 	// Auth routes
 	authController := controllers.NewAuthController(redisClient)
 	router.GET("/auth/tvdb", authController.GetTVDBToken)
+
+	// TV routes
+	seriesController := controllers.NewSeriesController(redisClient)
+	router.GET("/shows/search", seriesController.Search)
+	router.GET("/show/:id/episodes", seriesController.Get)
 }

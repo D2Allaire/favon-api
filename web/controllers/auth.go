@@ -1,10 +1,9 @@
 package controllers
 
 import (
+	"favon-api/services"
 	"fmt"
 	"net/http"
-
-	"favon-api/services"
 
 	"encoding/json"
 
@@ -12,24 +11,24 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+// AuthController Controller for authentication routes
 type AuthController struct {
 	redis *redis.Client
+	tvdb  *services.TVDB
 }
 
+// NewAuthController creates a new Auth Controller instance
 func NewAuthController(redisClient *redis.Client) *AuthController {
-	return &AuthController{
-		redis: redisClient,
-	}
-}
-
-func AuthIndex(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Welcome! \n")
+	a := AuthController{}
+	a.redis = redisClient
+	a.tvdb = services.NewTVDB(redisClient)
+	return &a
 }
 
 // GetTVDBToken Get a valid TVDB token for API calls.
-func (c *AuthController) GetTVDBToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	token := services.TVDBToken{}
-	token.Load(c.redis)
-	toJSON, _ := json.Marshal(token)
+func (a *AuthController) GetTVDBToken(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	a.tvdb.GetToken()
+	toJSON, _ := json.Marshal(a.tvdb.Token)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	fmt.Fprint(w, string(toJSON))
 }

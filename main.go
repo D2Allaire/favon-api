@@ -5,6 +5,8 @@ import (
 	"favon-api/web"
 	"log"
 
+	"os"
+
 	"github.com/joho/godotenv"
 )
 
@@ -18,6 +20,9 @@ func main() {
 	// Create redis client
 	redisClient := utils.CreateRedisClient()
 	defer redisClient.Close()
+
+	// Create Logger
+	utils.InitLog(os.Stdout, os.Stderr)
 
 	// Load routes and boot up server
 	web.Init(redisClient)
